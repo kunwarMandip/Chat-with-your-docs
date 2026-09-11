@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "http://127.0.0.1:8080"
+API_URL = "https://chat-with-your-docs-mnsg.onrender.com"
 
 st.title("Chat with your docs")
 
