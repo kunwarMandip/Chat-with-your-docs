@@ -13,7 +13,7 @@ def retrieve_chunks(question, session_id, n_results = 3):
         n_results= n_results,
         where = {"session_id": session_id}
     )
-    return results['documents'][0], results['metadata'][0]
+    return results['documents'][0], results['metadatas'][0]
 
 def ask_question(question, session_id):
     chunks, metadatas = retrieve_chunks(question, session_id)
