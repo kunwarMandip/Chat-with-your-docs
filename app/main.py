@@ -2,7 +2,7 @@ import os
 import shutil
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
-from app.ingestion import ingest_document
+from app.ingestion import ingest_pdf_bytes
 from app.retrieval import ask_question
 
 app = FastAPI(title="Chat with your docs")
@@ -15,12 +15,9 @@ async def ingest(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
-    save_path = os.path.join("documents", file.filename)
-    with open(save_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    ingest_document(save_path)
-    return {"message": f"Successfully ingested {file.filename}"}
+    file_bytes = await file.read()
+    num_chunks = ingest_pdf_bytes(file_bytes, file.filename)
+    return {"message": f"Successfully ingested {file.filename} ({num_chunks} chunks)"}
 
 @app.post("/ask")
 async def ask(request: QuestionRequest):
