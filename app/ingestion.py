@@ -15,10 +15,8 @@ def chunk_text(text, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
         chunks.append(text[start:end])
         start += chunk_size - overlap
     return chunks
-
-
     
-def ingest_pdf_bytes(file_bytes, filename):
+def ingest_pdf_bytes(file_bytes, filename, session_id):
     reader = PdfReader(io.BytesIO(file_bytes))
     text = ""
     for page in reader.pages:
@@ -26,7 +24,7 @@ def ingest_pdf_bytes(file_bytes, filename):
     
     chunks = chunk_text(text)
     ids = [f"{filename}_{i}" for i in range(len(chunks))]
-    metadatas = [{"source": filename, "chunk_index": i} for i in range(len(chunks))]
+    metadatas = [{"source": filename, "chunk_index": i, "session_id": session_id} for i in range(len(chunks))]
     
     collection.add(ids=ids, documents=chunks, metadatas=metadatas)
     print(f"Ingested {len(chunks)} chunks from {filename}")
