@@ -1,18 +1,14 @@
 import chromadb
 from openai import OpenAI
-from sentence_transformers import SentenceTransformer
 from app.config import EMBEDDING_MODEL, CHROMA_DB_PATH, GROQ_API_KEY, GROQ_MODEL
 
-embedder = SentenceTransformer(EMBEDDING_MODEL)
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
 collection = chroma_client.get_or_create_collection(name="documents")
 
 llm = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
 
 def retrieve_chunks(question, n_results=3):
-    query_embedding = embedder.encode([question]).tolist()
-    results = collection.query(query_embeddings=query_embedding, n_results=n_results)
-    # results['documents'][0] is the list of chunk texts; results['metadatas'][0] has their sources
+    results = collection.query(query_texts=[question], n_results=n_results)
     return results['documents'][0], results['metadatas'][0]
 
 

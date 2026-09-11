@@ -1,10 +1,8 @@
 import os
 from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
 import chromadb
 from app.config import EMBEDDING_MODEL, CHROMA_DB_PATH, CHUNK_SIZE, CHUNK_OVERLAP
 
-embedder = SentenceTransformer(EMBEDDING_MODEL)
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
 collection = chroma_client.get_or_create_collection(name="documents")
 
@@ -30,13 +28,11 @@ def ingest_document(filepath):
     chunks = chunk_text(text)
     print(f"Split into {len(chunks)} chunks")
 
-    embeddings = embedder.encode(chunks).tolist()
-
     filename = os.path.basename(filepath)
     ids = [f"{filename}_{i}" for i in range(len(chunks))]
     metadatas = [{"source": filename, "chunk_index": i} for i in range(len(chunks))]
 
-    collection.add(ids=ids, embeddings=embeddings, documents=chunks, metadatas=metadatas)
+    collection.add(ids=ids, documents=chunks, metadatas=metadatas)
     print(f"Ingested {len(chunks)} chunks from {filename}")
 
 if __name__ == "__main__":
