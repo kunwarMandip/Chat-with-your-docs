@@ -7,13 +7,16 @@ collection = chroma_client.get_or_create_collection(name="documents")
 
 llm = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
 
-def retrieve_chunks(question, n_results=3):
-    results = collection.query(query_texts=[question], n_results=n_results)
-    return results['documents'][0], results['metadatas'][0]
+def retrieve_chunks(question, session_id, n_results = 3):
+    results = collection.query(
+        query_texts= [question],
+        n_results= n_results,
+        where = {"session_id": session_id}
+    )
+    return results['documents'][0], results['metadata'][0]
 
-
-def ask_question(question):
-    chunks, metadatas = retrieve_chunks(question)
+def ask_question(question, session_id):
+    chunks, metadatas = retrieve_chunks(question, session_id)
 
     context = "\n\n---\n\n".join(chunks)
     prompt = f"""Answer the question using ONLY the context below. If the answer isn't in the context, say so — don't make anything up.

@@ -1,8 +1,12 @@
-import streamlit as st
+import uuid
 import requests
+import streamlit as st
 
 API_URL = "https://chat-with-your-docs-mnsg.onrender.com"
 
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+    
 st.title("Chat with your docs")
 
 st.header("Upload a document")
@@ -12,7 +16,9 @@ if uploaded_file is not None and st.button("Ingest document"):
     files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}
     with st.spinner("Ingesting... (can take up to a minute if the backend was asleep)"):
         try:
-            response = requests.post(f"{API_URL}/ingest", files=files, timeout=120)
+            data = {"session_id": st.session_state.session_id}
+            response = requests.post(f"{API_URL}/ingest", files=files, data=data, timeout=120)
+            #response = requests.post(f"{API_URL}/ingest", files=files, timeout=120)
             if response.status_code == 200:
                 st.success(response.json()["message"])
             else:
@@ -29,7 +35,8 @@ question = st.text_input("Your question")
 if st.button("Ask") and question:
     with st.spinner("Thinking..."):
         try:
-            response = requests.post(f"{API_URL}/ask", json={"question": question}, timeout=120)
+            response = requests.post(f"{API_URL}/ask", json={"question": question, "session_id": st.session_state.session_id}, timeout=120)
+            #response = requests.post(f"{API_URL}/ask", json={"question": question}, timeout=120)
             if response.status_code == 200:
                 data = response.json()
                 st.write(data["answer"])

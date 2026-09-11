@@ -16,6 +16,8 @@ def chunk_text(text, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
         start += chunk_size - overlap
     return chunks
 
+
+    
 def ingest_pdf_bytes(file_bytes, filename):
     reader = PdfReader(io.BytesIO(file_bytes))
     text = ""
