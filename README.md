@@ -1,4 +1,4 @@
-# Chat With Your Docs
+# RAG Chat With Your Docs
 
 A RAG (Retrieval-Augmented Generation) application that lets you upload PDF documents and ask questions about them in plain English, with answers grounded in the actual document content and sourced back to the file they came from.
 
